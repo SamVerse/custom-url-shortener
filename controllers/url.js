@@ -5,8 +5,8 @@ import { URL } from '../models/url.js';
 // Function to generate a new short URL
 async function handleGenerateNewShortURL(req, res) {
     const { url } = req.body;
-    if(!url) {
-        return res.status(400).json({message: 'URL is required'});
+    if (!url) {
+        return res.status(400).json({ message: 'URL is required' });
     }
     const shortId = nanoid(8);
     await URL.create({
@@ -15,8 +15,14 @@ async function handleGenerateNewShortURL(req, res) {
         visitHistory: [],
         createdBy: req.user._id
     });
+
+    // Fetch all URLs created by the user
+    const allurls = await URL.find({ createdBy: req.user._id });
+
     return res.render('home', {
-        id: shortId
+        id: shortId,
+        urls: allurls,
+        user: req.user
     });
 }
 
